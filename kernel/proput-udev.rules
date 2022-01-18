@@ -1,0 +1,2 @@
+SUBSYSTEM=="module", DEVPATH=="/module/proput", ACTION=="add", RUN+="/usr/local/share/proput/proput-udev-add.sh"
+SUBSYSTEM=="module", DEVPATH=="/module/proput", ACTION=="remove", RUN+="/usr/local/share/proput/proput-udev-rm.sh"
