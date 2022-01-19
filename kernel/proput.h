@@ -1,5 +1,5 @@
 /*
- *	ProPuT
+ *	ProPuT public API
  *
  *	(c) 2022 Maria Matejka <mq@jmq.cz>
  *
@@ -9,9 +9,7 @@
 #ifndef PROPUT_H_INCLUDED_
 #define PROPUT_H_INCLUDED_
 
-#define PROPUT_TYPE_SEND_BITS	  1
-
-#define PROPUT_CMD_VAL(s)   ((s[0] << 8) + s[1])
+#define PROPUT_CMD_VAL(x, y)   ((x << 8) + y)
 
 struct proput_cmd_header {
   uint16_t cmd;
@@ -25,9 +23,9 @@ struct proput_response_header {
   unsigned char data[0];
 };
 
-#define PROPUT_C_DEVLIST	PROPUT_CMD_VAL("DL")
+#define PROPUT_C_DEVLIST	PROPUT_CMD_VAL('D', 'L')
 
-#define PROPUT_R_DEVLIST	PROPUT_CMD_VAL("DL")
-#define PROPUT_R_BUF		PROPUT_CMD_VAL("Bu")
+#define PROPUT_R_DEVLIST	PROPUT_CMD_VAL('D', 'L')
+#define PROPUT_R_BUF		PROPUT_CMD_VAL('B', 'u')
 
 #endif

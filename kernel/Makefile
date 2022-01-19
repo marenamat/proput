@@ -1,4 +1,5 @@
 obj-m += proput.o
+proput-objs := ufp.o main.o device.o
 VERSION := $(shell uname -r)
 
 all:
