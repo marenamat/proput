@@ -1,0 +1,21 @@
+#!/bin/bash
+
+PACKAGE=$1
+VERSION=$2
+
+cat <<EOF
+Source: ${PACKAGE}
+Section: misc
+Priority: optional
+Maintainer: Maria Matejka <mq@jmq.cz>
+Standards-Version: 4.3.0
+
+Package: ${PACKAGE}
+Architecture: all
+Section: misc
+Depends: dkms
+Description: ProPuT
+ Programmable Pusher and Trainer, just for fun.
+EOF
+
+#Version: ${VERSION}

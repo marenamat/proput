@@ -1,0 +1,15 @@
+#!/bin/bash
+
+PACKAGE=$1
+VERSION=$2
+
+cat <<EOF
+PACKAGE_NAME=${PACKAGE}
+PACKAGE_VERSION=${VERSION}
+BUILT_MODULE_NAME[0]="${PACKAGE}"
+MAKE[0]="make -C \${kernel_source_dir} M=\${dkms_tree}/${PACKAGE}/${VERSION}/build"
+CLEAN="make -C \${kernel_source_dir} M=\${dkms_tree}/${PACKAGE}/${VERSION}/build clean"
+DEST_MODULE_LOCATION[0]=/extra
+REMAKE_INITRD=no
+AUTOINSTALL=yes
+EOF

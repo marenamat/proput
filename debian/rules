@@ -1,0 +1,50 @@
+#!/bin/bash
+export DH_VERBOSE=1
+
+SELF=proput
+VERSION=$(git describe | sed 's/^v//')
+
+echo "13" > debian/compat
+
+dh_testdir
+
+case "$1" in
+  clean)
+    dh_testroot
+    rm -rf build_tmp
+    dh_clean
+    exit 0
+    ;;
+
+  build)
+    mkdir build_tmp
+    ../../debian/dkms.gen ${SELF} ${VERSION} > build_tmp/dkms.conf
+    ;;
+
+  binary)
+    dh_testroot
+    dh_prep
+    dh_installdirs
+
+    DKMS_DIR=debian/${SELF}/usr/src/${SELF}-${VERSION}
+    install -d -m 755 ${DKMS_DIR}
+    for f in proput.c proput.h Makefile; do
+      install -m 644 ../../kernel/$f ${DKMS_DIR}/$f
+    done
+#    install -m 644 build_tmp/dkms.conf ${DKMS_DIR}/dkms.conf
+
+    echo "BEFORE"
+    dh_dkms build_tmp/dkms.conf
+    echo "AFTER"
+
+    dh_installchangelogs
+    dh_installdeb
+    dh_gencontrol
+    dh_md5sums
+    dh_builddeb
+    ;;
+
+  *)
+    exit 1
+    ;;
+esac

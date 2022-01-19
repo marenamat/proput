@@ -77,5 +77,5 @@ module_exit(proput_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Maria Matejka <mq@jmq.cz>");
 MODULE_DESCRIPTION("ProPuT");
-MODULE_SUPPORTED_DEVICE("proput");
+//MODULE_SUPPORTED_DEVICE("proput");
 
