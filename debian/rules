@@ -52,6 +52,16 @@ EOF
 
     dh_installudev
 
+    # Install the userspace daemon
+    LIB_DIR=/usr/lib/${SELF}
+    install -d -m 755 ${DEBPREFIX}${LIB_DIR}
+    install -m 755 ../../daemon/proput.py ${DEBPREFIX}${LIB_DIR}/proput.py
+
+    install -d -m 755 ${DEBPREFIX}${LIB_DIR}/proput
+    for f in device kernel; do
+      install -m 644 ../../daemon/proput/$f.py ${DEBPREFIX}${LIB_DIR}/proput/$f.py
+    done
+
     # Finish the package
     dh_installchangelogs
     dh_installdeb

@@ -13,7 +13,7 @@ Standards-Version: 4.3.0
 Package: ${PACKAGE}
 Architecture: all
 Section: misc
-Depends: dkms
+Depends: dkms ${python3:Depends}
 Description: ProPuT
  Programmable Pusher and Trainer, just for fun.
 EOF
