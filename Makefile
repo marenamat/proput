@@ -5,7 +5,8 @@ DEB_DIR := build/$(SELF)-$(VERSION)
 
 MKDIR = mkdir -p $(dir $@)
 
-deb: $(SELF)-$(VERSION).deb
+deb: $(addprefix $(DEB_DIR)/debian/,control changelog rules)
+	cd $(DEB_DIR) && dpkg-buildpackage -uc -us -rfakeroot
 
 %/control: debian/control.gen
 	$(MKDIR)
@@ -20,9 +21,6 @@ deb: $(SELF)-$(VERSION).deb
 $(DEB_DIR)/debian/rules: debian/rules
 	$(MKDIR)
 	cp $< $@
-
-$(DEB_NAME): $(addprefix $(DEB_DIR)/debian/,control changelog rules)
-	cd $(DEB_DIR) && dpkg-buildpackage -uc -us -rfakeroot
 
 clean::
 	rm -rf $(DEB_DIR) build
