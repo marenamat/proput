@@ -9,7 +9,7 @@
 #ifndef PROPUT_H_INCLUDED_
 #define PROPUT_H_INCLUDED_
 
-#define PROPUT_CMD_VAL(x, y)   ((x << 8) + y)
+#define PROPUT_CMD_VAL(x, y)   ((y << 8) + x)
 
 struct proput_cmd_header {
   uint16_t cmd;
