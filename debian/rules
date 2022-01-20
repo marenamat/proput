@@ -58,7 +58,7 @@ EOF
     install -m 755 ../../daemon/proput.py ${DEBPREFIX}${LIB_DIR}/proput.py
 
     install -d -m 755 ${DEBPREFIX}${LIB_DIR}/proput
-    for f in device kernel; do
+    for f in __init__ device kernel; do
       install -m 644 ../../daemon/proput/$f.py ${DEBPREFIX}${LIB_DIR}/proput/$f.py
     done
 
