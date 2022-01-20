@@ -33,7 +33,9 @@ DEFINE_MUTEX(ufp_mutex);
 
 int ufp_response(struct ufp_context *ctx, struct proput_response_header *hdr)
 {
-  mutex_lock(&ctx->lock);
+  if (mutex_lock_interruptible(&ctx->lock))
+    return -EIO;
+
   if (ctx->read_end)
   {
     mutex_unlock(&ctx->lock);
@@ -50,6 +52,7 @@ int ufp_response(struct ufp_context *ctx, struct proput_response_header *hdr)
   ctx->read_end = hdr->len;
 
   wake_up(&ctx->read_queue);
+  mutex_unlock(&ctx->lock);
 
   return 0;
 }
@@ -225,6 +228,7 @@ static int ufp_release(struct inode *inode, struct file *file)
     ctx->next->prev = ctx->prev;
 
   mutex_unlock(&ufp_dev.lock);
+  mutex_unlock(&ctx->lock);
 
   file->private_data = NULL;
   kfree(ctx);
