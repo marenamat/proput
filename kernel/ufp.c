@@ -34,19 +34,26 @@ DEFINE_MUTEX(ufp_mutex);
 int ufp_response(struct ufp_context *ctx, struct proput_response_header *hdr)
 {
   if (mutex_lock_interruptible(&ctx->lock))
+  {
+    DBG("Lock interrupted before response could be buffered\n");
     return -EIO;
+  }
 
   if (ctx->read_end)
   {
     mutex_unlock(&ctx->lock);
+    DBG("Pending previous response in read buffer %p (size %u)\n", ctx, ctx->read_end);
     return -EBUSY;
   }
 
   if (hdr->len > MAX_READ_BUF_SIZE)
   {
     mutex_unlock(&ctx->lock);
+    ERR("Too big message for read buffer\n");
     return -ENOBUFS;
   }
+
+  DBG("Putting a response of size %u to read buffer %p\n", hdr->len, ctx);
 
   memcpy(ctx->read_buf, hdr, hdr->len);
   ctx->read_end = hdr->len;
@@ -81,11 +88,19 @@ static ssize_t ufp_read(struct file *fp, char __user *buf, size_t sz, loff_t *of
   void *response;
   uint16_t len;
 
+  DBG("Read on %p\n", fp);
+
   if (!ctx)
+  {
+    ERR("No context found\n");
     return -EINVAL;
+  }
 
   if (sz < sizeof(struct proput_response_header))
+  {
+    DBG("Message too short\n");
     return -EINVAL;
+  }
 
   if (mutex_lock_interruptible(&ctx->lock))
     return -ERESTARTSYS;
@@ -137,21 +152,30 @@ static ssize_t ufp_write(struct file *fp, const char __user *buf, size_t sz, lof
 {
   struct proput_cmd_header hdr;
 
+  DBG("Write to %p\n", fp);
+
   if (sz < sizeof(struct proput_cmd_header))
+  {
+    DBG("Message too short\n");
     return -EINVAL;
+  }
 
   if (copy_from_user(&hdr, buf, sizeof(struct proput_cmd_header)))
     return -EFAULT;
 
   if (sz != hdr.len)
+  {
+    DBG("Message length %u, declared length %u\n", (unsigned) sz, (unsigned) hdr.len);
     return -EINVAL;
+  }
 
   switch (hdr.cmd) {
-#define OP(cmd, fun)  case cmd: return fun(fp->private_data, &hdr, buf, sz);
+#define OP(cmd, fun)  case cmd: return fun(fp->private_data, &hdr, buf, sz) ?: sz;
     PROPUT_OPS
 #undef OP
 
     default:
+      DBG("Invalid command: %04x\n", hdr.cmd);
       return -EINVAL;
   }
 }
@@ -260,7 +284,7 @@ int ufp_init(void)
 
   cdev_init(&ufp_dev.cdev, &ufp_ops);
   ufp_dev.cdev.owner = THIS_MODULE;
-  
+
   if ((e = cdev_add(&ufp_dev.cdev, ufp_dev.id, 1)))
   {
     printk(KERN_ALERT "Failed to add proput device: %d\n", e);

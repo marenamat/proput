@@ -35,4 +35,7 @@ int ufp_response(struct ufp_context *ctx, struct proput_response_header *hdr);
 PROPUT_OPS
 #undef OP
 
+#define DBG(...)  printk(KERN_INFO "ProPuT: " __VA_ARGS__)
+#define ERR(...)  printk(KERN_ERR "ProPuT: (E)" __VA_ARGS__)
+
 #endif
