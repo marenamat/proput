@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+CUR_VERSION=$(git describe --abbrev=0)
+
+VP=${CUR_VERSION%.*}
+VS=${CUR_VERSION##*.}
+
+NVS=$((VS+1))
+NEW_VERSION="$VP.$NVS"
+
+echo $NEW_VERSION
+
+git tag -am "Automatic version: $NEW_VERSION" $NEW_VERSION
+
