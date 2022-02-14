@@ -1,0 +1,5 @@
+#!/bin/bash
+
+#DEBHELPER#
+
+rm -f /boot/firmware/overlays/proput.dtbo

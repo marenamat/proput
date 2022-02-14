@@ -1,0 +1,28 @@
+/*
+ * Overlay for Raspberry Pi GPIO ProPut.
+ * Build:
+ * 	- `sudo dtc -W no-unit_address_vs_reg -@ -I dts -O dtb -o /boot/firmware/proput.dtbo /usr/share/proput/proput.dts`
+ * Activate:
+ *	- echo -n "# Enable ProPut\ndtoverlay=proput" >> /boot/firmware/config.txt
+ *
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	fragment@0 {
+		target-path = "/soc";
+		__overlay__ {
+			gpio:gpio@7e200000 {};
+			proput@0 {
+				compatible = "proput";
+				gpios = <&gpio 17 0>,
+					<&gpio 18 0>,
+					<&gpio 22 0>,
+					<&gpio 23 0>,
+					<&gpio 24 0>,
+					<&gpio 27 0>;
+			};
+		};
+	};
+};

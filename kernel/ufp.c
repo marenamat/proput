@@ -12,6 +12,8 @@
 #include <linux/fs.h>
 #include <linux/poll.h>
 
+static int ufp_inited = 0;
+
 static struct ufp_dev {
   struct ufp_context *ctx_first;
   struct mutex lock;
@@ -274,6 +276,9 @@ int ufp_init(void)
 {
   int e;
 
+  if (ufp_inited)
+    return -EBUSY;
+
   mutex_init(&ufp_dev.lock);
 
   if ((e = alloc_chrdev_region(&ufp_dev.id, 0, 1, "proput")))
@@ -292,11 +297,19 @@ int ufp_init(void)
     return e;
   }
 
+  ufp_inited = 1;
   return 0;
 }
 
 void ufp_exit(void)
 {
+  if (!ufp_inited)
+  {
+    printk(KERN_ALERT "Attempted to exit already exited proput ufp\n");
+    return;
+  }
+
   cdev_del(&ufp_dev.cdev);
   unregister_chrdev_region(ufp_dev.id, 1);
+  ufp_inited = 0;
 }

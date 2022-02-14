@@ -62,6 +62,11 @@ EOF
       install -m 644 ../../daemon/proput/$f.py ${DEBPREFIX}${LIB_DIR}/proput/$f.py
     done
 
+    # Install device tree overlay
+    install -m 644 ../../kernel/${SELF}.dts ${DEBPREFIX}${SHARE_DIR}/${SELF}.dts
+    install -d 755 ${DEBPREFIX}/etc/modules-load.d/
+    install -m 644 ../../kernel/${SELF}-load.conf ${DEBPREFIX}/etc/modules-load.d/${SELF}.conf
+
     # Finish the package
     dh_installchangelogs
     dh_installdeb

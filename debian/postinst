@@ -1,0 +1,5 @@
+#!/bin/bash
+
+#DEBHELPER#
+
+dtc -W no-gpios_property -W no-unit_address_vs_reg -I dts -O dtb /usr/share/proput/proput.dts -o /boot/firmware/overlays/proput.dtbo

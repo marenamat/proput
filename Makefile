@@ -5,12 +5,20 @@ DEB_DIR := build/$(SELF)-$(VERSION)
 
 MKDIR = mkdir -p $(dir $@)
 
-deb: $(addprefix $(DEB_DIR)/debian/,control changelog rules)
+deb: $(addprefix $(DEB_DIR)/debian/,control changelog rules postinst prerm)
 	cd $(DEB_DIR) && dpkg-buildpackage -uc -us -rfakeroot
 
 %/control: debian/control.gen
 	$(MKDIR)
 	$< $(SELF) $(VERSION) > $@
+
+%/postinst: debian/postinst
+	$(MKDIR)
+	cp $< $@
+
+%/prerm: debian/prerm
+	$(MKDIR)
+	cp $< $@
 
 %/changelog: Makefile
 	$(MKDIR)
