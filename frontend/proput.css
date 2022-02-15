@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,900;1,400;1,900&display=swap');
+
+body {
+  font-family: 'Merriweather', serif;
+  background-color: black;
+}
+
+#container {
+  max-width: 1234px;
+  margin: 20px auto;
+  padding: 30px 40px;
+  background-color: white;
+  border-radius: 25px;
+}
+
+div.inactive {
+  background-color: rgb(255, 200, 200);
+}
+
+#overlay {
+  position: absolute;
+  max-width: 1111px;
+  margin: 0px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.overlay-hide {
+  display: none;
+}
+
+#overlay p {
+  display: block;
+  text-align: center;
+  margin: auto auto;
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 10px;
+  font-size: 200%;
+  font-weight: bold;
+}
+
+header {
+  border-bottom: 1px solid black;
+  padding-bottom: 20px;
+  margin-bottom: 10px;
+  font-size: 250%;
+  text-align: center;
+}
+
+.device {
+  border: 1px solid black;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+.device-name {
+  text-align: left;
+}

@@ -9,6 +9,7 @@ class UnassignedPins(Device):
         super().__init__()
 
         self.name = "unassigned"
+        self.displayName = "Unassigned Pins"
 
         if data is None:
             self.pins = 0
@@ -28,5 +29,10 @@ class UnassignedPins(Device):
 
     def remove(self):
         raise Exception("UnassignedPins metadevice must never be removed")
+
+    def toJSON(self):
+        out = super().toJSON()
+        out["pins"] = self.pins
+        return out
 
 UnassignedPins.register(1)

@@ -1,10 +1,16 @@
 #!/usr/bin/python3
 
+import json
+
 class DeviceList:
     def __init__(self, dev):
         self.dev = dev
         unas = UnassignedPins()
         self.devices = { unas.name: unas }
+        self.sockets = set()
+        self.ws_handlers = {
+                "devicelist": self.sendDeviceList
+                }
 
     async def connect(self):
         self.kernel = KernelConnector(self, self.dev)
@@ -27,12 +33,32 @@ class DeviceList:
             self.devices[name].remove()
             del self.devices[name]
 
+    async def websocket(self, socket, _):
+        self.sockets.add(socket)
+        async for message in socket:
+            obj = json.loads(message)
+            if obj["msgID"] > 0 and obj["request"] in self.ws_handlers:
+                await self.ws_handlers[obj["request"]](socket, obj)
+            else:
+                break
+        self.sockets.remove(socket)
+
+    async def sendDeviceList(self, socket, obj):
+        await socket.send(json.dumps({
+            "msgID": obj["msgID"],
+            "devices": dict(self.devices),
+            }, cls=DeviceEncoder))
+
+
 class Device:
     def merge(self, new):
         raise NotImplementedError("Devices must know how to merge themselves")
 
     def remove(self):
         raise NotImplementedError("Devices must know how to remove themselves")
+
+    def toJSON(self):
+        return { "name": self.name, "displayName": self.displayName }
 
     typemap = {}
     @classmethod
@@ -50,6 +76,11 @@ class Device:
             return self.typemap[_id]
 
         raise Exception("TypeID {_id} not registered")
+
+
+class DeviceEncoder(json.JSONEncoder):
+    def default(self, obj):
+        return obj.toJSON() if isinstance(obj, Device) else super().default(obj)
 
 # Deferred imports to avoid circular dependency hell
 from proput.kernel import KernelConnector
