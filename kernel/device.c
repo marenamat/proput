@@ -18,20 +18,47 @@ static struct proput_dev_data {
   struct device *dev;
   int num_gpios;
   struct gpio_desc **gpios;
+  struct mutex lock;
 } pdd;
+
+#define MAX_DEVLIST
 
 OP_DEF(cmd_devlist)
 {
-  struct proput_response_header rh;
+  struct {
+    struct proput_response_header rh;
+    struct proput_device_unused_pins up;
+  } response;
 
+  /* Check incoming message size */
   if (sz != sizeof(*hdr))
     return -EINVAL;
 
-  /* No devices yet to be listed */
-  rh.response = PROPUT_R_DEVLIST;
-  rh.len = sizeof(rh);
+  /* Fill in the response */
+  response.rh.response = PROPUT_R_DEVLIST;
+  response.rh.len = sizeof(response);
+  response.up.dh.type = PROPUT_DEVICE_TYPE_UNUSED;
+  response.up.dh.len = sizeof(response.up);
 
-  return ufp_response(ctx, &rh);
+  /* Get bits */
+  if (mutex_lock_interruptible(&pdd.lock))
+    return -ERESTARTSYS;
+
+  if (pdd.num_gpios == 64) {
+    response.up.pins[0] = response.up.pins[1] = ~0;
+  }
+  else if (pdd.num_gpios >= 32) {
+    response.up.pins[0] = ~0;
+    response.up.pins[1] = (1 << (pdd.num_gpios - 32)) - 1;
+  }
+  else {
+    response.up.pins[0] = (1 << pdd.num_gpios) - 1;
+    response.up.pins[1] = 0;
+  }
+
+  mutex_unlock(&pdd.lock);
+
+  return ufp_response(ctx, &response.rh);
 }
 
 static int proput_probe(struct platform_device *pdev)

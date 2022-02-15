@@ -6,6 +6,8 @@ import sys
 import logging
 import struct
 
+from proput.device import Device
+
 log = logging.getLogger(__name__)
 
 class KernelCommand:
@@ -45,9 +47,20 @@ class KernelDeviceListCommand(KernelCommand):
 
 class KernelDeviceListResponse(KernelResponse):
     def __init__(self, data):
-        self.list = []
         self.commandTypes = [ KernelDeviceListCommand ]
+        self.list = [ d for d in self.parseMsg(data) ]
         super().__init__()
+
+    def parseMsg(self, data):
+        while len(data) != 0:
+            if len(data) < 4:
+                raise Exception(f"Too short data remaining: {len(data)}")
+            T, = struct.unpack("=H", data[0:2])
+            L, = struct.unpack("=H", data[2:4])
+            if L > len(data) or L < 4:
+                raise Exception(f"Garbled data length: {L} in {len(data)} bytes")
+            yield Device.identify(T)(data[4:L])
+            data = data[L:]
 
 class KernelConnector:
     max_recv_buf = 256

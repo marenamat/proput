@@ -58,8 +58,13 @@ EOF
     install -m 755 ../../daemon/proput.py ${DEBPREFIX}${LIB_DIR}/proput.py
 
     install -d -m 755 ${DEBPREFIX}${LIB_DIR}/proput
-    for f in __init__ device kernel; do
+    for f in __init__ kernel; do
       install -m 644 ../../daemon/proput/$f.py ${DEBPREFIX}${LIB_DIR}/proput/$f.py
+    done
+
+    install -d -m 755 ${DEBPREFIX}${LIB_DIR}/proput/device
+    for f in __init__ unassigned; do
+      install -m 644 ../../daemon/proput/device/$f.py ${DEBPREFIX}${LIB_DIR}/proput/device/$f.py
     done
 
     # Install device tree overlay

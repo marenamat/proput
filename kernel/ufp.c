@@ -21,8 +21,6 @@ static struct ufp_dev {
   struct cdev cdev;
 } ufp_dev;
 
-#define MAX_READ_BUF_SIZE   256
-
 struct ufp_context {
   struct ufp_context *prev, *next;
   wait_queue_head_t read_queue;
@@ -38,7 +36,7 @@ int ufp_response(struct ufp_context *ctx, struct proput_response_header *hdr)
   if (mutex_lock_interruptible(&ctx->lock))
   {
     DBG("Lock interrupted before response could be buffered\n");
-    return -EIO;
+    return -ERESTARTSYS;
   }
 
   if (ctx->read_end)
@@ -48,7 +46,7 @@ int ufp_response(struct ufp_context *ctx, struct proput_response_header *hdr)
     return -EBUSY;
   }
 
-  if (hdr->len > MAX_READ_BUF_SIZE)
+  if (hdr->len > PROPUT_MAX_BUF_SIZE)
   {
     mutex_unlock(&ctx->lock);
     ERR("Too big message for read buffer\n");
@@ -204,7 +202,7 @@ static int ufp_open(struct inode *inode, struct file *file)
   mutex_init(&ctx->lock);
   init_waitqueue_head(&ctx->read_queue);
 
-  ctx->read_buf = kmalloc(MAX_READ_BUF_SIZE, GFP_KERNEL);
+  ctx->read_buf = kmalloc(PROPUT_MAX_BUF_SIZE, GFP_KERNEL);
   if (!ctx->read_buf)
   {
     kfree(ctx);
