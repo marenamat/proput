@@ -13,8 +13,7 @@
 	fragment@0 {
 		target-path = "/soc";
 		__overlay__ {
-			gpio:gpio@7e200000 {};
-			proput@0 {
+			proput {
 				compatible = "proput";
 				gpios = <&gpio 17 0>,
 					<&gpio 18 0>,
